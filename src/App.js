@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 
 import './App.css';
 
@@ -36,57 +36,63 @@ import 'videojs-record/dist/plugins/videojs.record.webm-wasm.js';
 import 'videojs-record/dist/plugins/videojs.record.ts-ebml.js';
 */
 
-class App extends Component {
-  componentDidMount() {
+
+const App = (props) => {
+  let videoNode;
+  // componentDidMount
+  useEffect(() => {
+    console.log('useEffect runs')
     // instantiate Video.js
-    this.player = videojs(this.videoNode, this.props, () => {
+    const player = videojs(videoNode, props, () => {
       // print version information at startup
-      var version_info = 'Using video.js ' + videojs.VERSION +
+      let version_info = 'Using video.js ' + videojs.VERSION +
         ' with videojs-record ' + videojs.getPluginVersion('record') +
         ' and recordrtc ' + RecordRTC.version;
       videojs.log(version_info);
     });
 
     // device is ready
-    this.player.on('deviceReady', () => {
+    player.on('deviceReady', () => {
       console.log('device is ready!');
     });
 
     // user clicked the record button and started recording
-    this.player.on('startRecord', () => {
+    player.on('startRecord', () => {
       console.log('started recording!');
     });
 
     // user completed recording and stream is available
-    this.player.on('finishRecord', () => {
+    player.on('finishRecord', () => {
       // recordedData is a blob object containing the recorded data that
       // can be downloaded by the user, stored on server etc.
-      console.log('finished recording: ', this.player.recordedData);
+      console.log('finished recording: ', player.recordedData);
     });
 
     // error handling
-    this.player.on('error', (element, error) => {
+    player.on('error', (element, error) => {
       console.warn(error);
     });
 
-    this.player.on('deviceError', () => {
-      console.error('device error:', this.player.deviceErrorCode);
+    player.on('deviceError', () => {
+      console.error('device error:', player.deviceErrorCode);
     });
-  }
+
+  }, [videoNode]);
+  // Do I need to call useEffect again to destroy it?
 
   // destroy player on unmount
-  componentWillUnmount() {
-    if (this.player) {
-      this.player.dispose();
-    }
-  }
-  render() {
-    return (
-      <div data-vjs-player>
-        <video id="myVideo" ref={node => this.videoNode = node} className="video-js vjs-default-skin" playsInline></video>
-      </div>
-    );
-  }
+  // componentWillUnmount() {
+  //   if (player) {
+  //     player.dispose();
+  //   }
+  // }
+
+  return (
+    <div data-vjs-player>
+      <video id="myVideo" ref={node => videoNode = node} className="video-js vjs-default-skin" playsInline></video>
+    </div>
+  );
+
 }
 
 export default App;
